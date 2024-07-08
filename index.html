@@ -3,19 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time Data</title>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <title>Socket.IO Client Example</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
 </head>
 <body>
-    <h1>Real-time Data</h1>
-    <div id="data"></div>
+    <h1>Socket.IO Client Example</h1>
+    <div id="data-container">
+        <p>Waiting for data...</p>
+    </div>
 
     <script>
-        const socket = io();
+        // Connect to Socket.IO server
+        const socket = io('http://192.168.1.39:5000'); // Replace with your server URL and port
 
+        socket.on('connect', () => {
+            console.log('Connected to Socket.IO server');
+        });
+
+        // Listen for 'data' events from the server
         socket.on('data', (data) => {
-            const dataDiv = document.getElementById('data');
-            dataDiv.innerHTML = `Time: ${data.time}, ID: ${data.ID}`;
+            console.log(data);
+            // console.log('Received data:', data);
+            // Update HTML to display received data
+            // const dataContainer = document.getElementById('data-container');
+            // dataContainer.innerHTML = `<p>Received data: ${JSON.stringify(data)}</p>`;
+        });
+
+        // Handle disconnect event
+        socket.on('disconnect', () => {
+            console.log('Disconnected from Socket.IO server');
+            // Attempt to reconnect
+            setTimeout(() => {
+                console.log('Attempting to reconnect...');
+                socket.connect();
+            }, 1000); // Retry connection after 1 second
+        });
+
+        // Handle connection error
+        socket.on('error', (error) => {
+            console.error('Socket.IO error:', error);
+            // Attempt to reconnect
+            setTimeout(() => {
+                console.log('Attempting to reconnect...');
+                socket.connect();
+            }, 1000); // Retry connection after 1 second
         });
     </script>
 </body>
